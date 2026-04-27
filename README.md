@@ -1,4 +1,4 @@
-# Project Planning Service (Java Implementation)
+## Microservices Communication Implementation 
 
 ## Project Overview
 This is a Java-based microservice architecture developed using **Spring Boot**. The system demonstrates how two independent services can communicate and aggregate data using the **API Composition** pattern.
@@ -33,4 +33,4 @@ The integration is handled in the `ProjectPlanService` class. When a request is 
 * **Team Resource:** `GET http://localhost:9003/api/v1/team/{id}`
 
 ---
-*Software Engineering Project*
+*Advanced Software Engineering Project*
