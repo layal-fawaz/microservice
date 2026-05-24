@@ -1,0 +1,93 @@
+version: '3.8'
+
+services:
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"    # AMQP port
+      - "15672:15672"  # Management UI
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    networks:
+      - microservices-net
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  user-service:
+    build: ./user-service
+    ports:
+      - "9001:9001"
+    networks:
+      - microservices-net
+
+  planning-service:
+    build: ./planning-service
+    ports:
+      - "9002:9002"
+    environment:
+      SPRING_RABBITMQ_HOST: rabbitmq
+      TEAM_SERVICE_URL: http://team-service:9003
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      team-service:
+        condition: service_started
+    networks:
+      - microservices-net
+
+  team-service:
+    build: ./team-service
+    ports:
+      - "9003:9003"
+    networks:
+      - microservices-net
+
+  idea-service:
+    build: ./idea-service
+    ports:
+      - "9004:9004"
+    environment:
+      SPRING_RABBITMQ_HOST: rabbitmq
+      PAYMENT_SERVICE_URL: http://payment-service:9007
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      payment-service:
+        condition: service_started
+    networks:
+      - microservices-net
+
+  task-service:
+    build: ./task-service
+    ports:
+      - "9005:9005"
+    environment:
+      PROGRESS_SERVICE_URL: http://progress-service:9006
+    depends_on:
+      - progress-service
+    networks:
+      - microservices-net
+
+  progress-service:
+    build: ./progress-service
+    ports:
+      - "9006:9006"
+    networks:
+      - microservices-net
+
+  payment-service:
+    build: ./payment-service
+    ports:
+      - "9007:9007"
+    networks:
+      - microservices-net
+
+networks:
+  microservices-net:
+    driver: bridge
