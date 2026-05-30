@@ -1,4 +1,4 @@
-name: CI/CD - Planning Service
+name: CI/CD - Team Service
 
 on:
   push:
@@ -11,21 +11,21 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up JDK 17
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
 
       - name: Grant execute permission for gradlew
-        run: chmod +x planning-service/gradlew
+        run: chmod +x gradlew
+        working-directory: team-service
 
       - name: Build JAR
-        run: |
-          cd planning-service
-          ./gradlew bootJar -x test
+        run: ./gradlew bootJar -x test
+        working-directory: team-service
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
@@ -36,6 +36,6 @@ jobs:
       - name: Build and Push Docker Image
         uses: docker/build-push-action@v5
         with:
-          context: ./planning-service
+          context: ./team-service
           push: true
-          tags: layal12/planning_service:latest
+          tags: layal12/team-service:latest
