@@ -1,0 +1,680 @@
+{
+  "info": {
+    "_postman_id": "2d288eaa-8664-4822-89d1-302679d0e88b",
+    "name": "AI Project Planning - Microservices",
+    "description": "## **This Postman collection is for the AI-Powered Project Planning Platform, which consists of 7 independent microservices built with Spring Boot.**\n\nThe platform allows users to submit project ideas, validate subscriptions, assign team members, create tasks, and track progress automatically.\n\n### **The collection is organized by service in the correct execution order:**\n\n1. Payment Service — subscribe and validate user subscription\n    \n2. User Service — register and login\n    \n3. Team Service — add and manage team members\n    \n4. Planning Service — create project plans and fetch full details with team member\n    \n5. Progress Service — view progress reports and project summary\n    \n6. Task Service — create tasks, assign to members, and update status\n    \n7. Idea Service — submit an idea and trigger AI analysis which validates payment synchronously then sends the idea to RabbitMQ asynchronously for the Planning Service to process\n    \n\n**Before running: start RabbitMQ using Docker and run each service using ./gradlew bootRun**",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "50453238",
+    "_collection_link": "https://go.postman.co/collection/50453238-2d288eaa-8664-4822-89d1-302679d0e88b?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "1. Payment Service",
+      "item": [
+        {
+          "name": "Subscribe",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": 1,\n  \"tier\": \"PRO\"\n}"
+            },
+            "url": {
+              "raw": "localhost:9007/api/v1/payment/subscribe",
+              "host": [
+                "localhost"
+              ],
+              "port": "9007",
+              "path": [
+                "api",
+                "v1",
+                "payment",
+                "subscribe"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Validate Subscription",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "localhost:9007/api/v1/payment/validate/1",
+              "host": [
+                "localhost"
+              ],
+              "port": "9007",
+              "path": [
+                "api",
+                "v1",
+                "payment",
+                "validate",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Subscriptions",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "localhost:9007/api/v1/payment",
+              "host": [
+                "localhost"
+              ],
+              "port": "9007",
+              "path": [
+                "api",
+                "v1",
+                "payment"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "2. User Service",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"layal@test.com\",\n  \"password\": \"1234\",\n  \"role\": \"ADMIN\"\n}"
+            },
+            "url": {
+              "raw": "localhost:9001/api/v1/auth/register",
+              "host": [
+                "localhost"
+              ],
+              "port": "9001",
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "register"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"layal@test.com\",\n  \"password\": \"1234\"\n}"
+            },
+            "url": {
+              "raw": "localhost:9001/api/v1/auth/login",
+              "host": [
+                "localhost"
+              ],
+              "port": "9001",
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Validate Token",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "localhost:9001/api/v1/auth/validate?token=YOUR_TOKEN_HERE",
+              "host": [
+                "localhost"
+              ],
+              "port": "9001",
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "validate"
+              ],
+              "query": [
+                {
+                  "key": "token",
+                  "value": "YOUR_TOKEN_HERE"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Users",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "localhost:9001/api/v1/auth/users",
+              "host": [
+                "localhost"
+              ],
+              "port": "9001",
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "users"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "3. Team Service",
+      "item": [
+        {
+          "name": "Add Member",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"layal\",\n  \"skill\": \"Frontend Developer\",\n  \"available\": true\n}"
+            },
+            "url": {
+              "raw": "localhost:9003/api/v1/team",
+              "host": [
+                "localhost"
+              ],
+              "port": "9003",
+              "path": [
+                "api",
+                "v1",
+                "team"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Member by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "localhost:9003/api/v1/team/1",
+              "host": [
+                "localhost"
+              ],
+              "port": "9003",
+              "path": [
+                "api",
+                "v1",
+                "team",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Members",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "localhost:9003/api/v1/team",
+              "host": [
+                "localhost"
+              ],
+              "port": "9003",
+              "path": [
+                "api",
+                "v1",
+                "team"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "4. Planning Service",
+      "item": [
+        {
+          "name": "Create Plan",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ideaDescription\": \"AI Task Manager\",\n  \"category\": \"AI Platform\",\n  \"estimatedWeeks\": 12,\n  \"memberId\": 1\n}"
+            },
+            "url": {
+              "raw": "localhost:9002/api/v1/plans",
+              "host": [
+                "localhost"
+              ],
+              "port": "9002",
+              "path": [
+                "api",
+                "v1",
+                "plans"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Plans",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "localhost:9002/api/v1/plans",
+              "host": [
+                "localhost"
+              ],
+              "port": "9002",
+              "path": [
+                "api",
+                "v1",
+                "plans"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Full Details (Plan + Team Member)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "localhost:9002/api/v1/plans/full-details/1",
+              "host": [
+                "localhost"
+              ],
+              "port": "9002",
+              "path": [
+                "api",
+                "v1",
+                "plans",
+                "full-details",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "5. Progress Service",
+      "item": [
+        {
+          "name": "Get All Reports",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "localhost:9006/api/v1/progress",
+              "host": [
+                "localhost"
+              ],
+              "port": "9006",
+              "path": [
+                "api",
+                "v1",
+                "progress"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Project Summary",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "localhost:9006/api/v1/progress/project/1/summary",
+              "host": [
+                "localhost"
+              ],
+              "port": "9006",
+              "path": [
+                "api",
+                "v1",
+                "progress",
+                "project",
+                "1",
+                "summary"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Reports by Project",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "localhost:9006/api/v1/progress/project/1",
+              "host": [
+                "localhost"
+              ],
+              "port": "9006",
+              "path": [
+                "api",
+                "v1",
+                "progress",
+                "project",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "6. Task Service",
+      "item": [
+        {
+          "name": "Create Task",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"projectId\": 1,\n  \"title\": \"Design UI\",\n  \"priority\": \"HIGH\"\n}"
+            },
+            "url": {
+              "raw": "localhost:9005/api/v1/tasks",
+              "host": [
+                "localhost"
+              ],
+              "port": "9005",
+              "path": [
+                "api",
+                "v1",
+                "tasks"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Assign Task",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"member_id\": 1\n}"
+            },
+            "url": {
+              "raw": "localhost:9005/api/v1/tasks/1/assign",
+              "host": [
+                "localhost"
+              ],
+              "port": "9005",
+              "path": [
+                "api",
+                "v1",
+                "tasks",
+                "1",
+                "assign"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Task Status → notifies progress-service",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"new_status\": \"COMPLETED\",\n  \"completion_percentage\": 100\n}"
+            },
+            "url": {
+              "raw": "localhost:9005/api/v1/tasks/1/status",
+              "host": [
+                "localhost"
+              ],
+              "port": "9005",
+              "path": [
+                "api",
+                "v1",
+                "tasks",
+                "1",
+                "status"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Tasks",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "localhost:9005/api/v1/tasks",
+              "host": [
+                "localhost"
+              ],
+              "port": "9005",
+              "path": [
+                "api",
+                "v1",
+                "tasks"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Tasks by Project",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "localhost:9005/api/v1/tasks/project/1",
+              "host": [
+                "localhost"
+              ],
+              "port": "9005",
+              "path": [
+                "api",
+                "v1",
+                "tasks",
+                "project",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "7. Idea Service — Full Flow",
+      "item": [
+        {
+          "name": "Submit Idea",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": 1,\n  \"ideaDescription\": \"Automated Task Generation System\",\n  \"category\": \"AI Platform\"\n}"
+            },
+            "url": {
+              "raw": "localhost:9004/api/v1/ideas",
+              "host": [
+                "localhost"
+              ],
+              "port": "9004",
+              "path": [
+                "api",
+                "v1",
+                "ideas"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Analyze Idea → validates payment (sync) → sends RabbitMQ (async)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "localhost:9004/api/v1/ideas/1/analyze",
+              "host": [
+                "localhost"
+              ],
+              "port": "9004",
+              "path": [
+                "api",
+                "v1",
+                "ideas",
+                "1",
+                "analyze"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Ideas",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "localhost:9004/api/v1/ideas",
+              "host": [
+                "localhost"
+              ],
+              "port": "9004",
+              "path": [
+                "api",
+                "v1",
+                "ideas"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Verify → Plan created in planning-service",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "localhost:9002/api/v1/plans",
+              "host": [
+                "localhost"
+              ],
+              "port": "9002",
+              "path": [
+                "api",
+                "v1",
+                "plans"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Verify → Progress summary",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "localhost:9006/api/v1/progress/project/1/summary",
+              "host": [
+                "localhost"
+              ],
+              "port": "9006",
+              "path": [
+                "api",
+                "v1",
+                "progress",
+                "project",
+                "1",
+                "summary"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
